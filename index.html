@@ -151,13 +151,30 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 
 /* Research cards */
 .featured {
-  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 0;
   background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
   margin-bottom: 1.25rem;
 }
-.featured .figslot { border-radius: 0; border: 0; border-right: 1px solid var(--line); min-height: 22rem; aspect-ratio: auto; }
 .featured .body { padding: clamp(1.5rem, 3vw, 2.5rem); min-width: 0; display: flex; flex-direction: column; }
-@media (max-width: 860px) { .featured { grid-template-columns: 1fr; } .featured .figslot { border-right: 0; border-bottom: 1px solid var(--line); min-height: 14rem; } }
+.featured .lead-in { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: clamp(1.25rem, 3vw, 2.5rem); align-items: start; }
+@media (max-width: 860px) { .featured .lead-in { grid-template-columns: 1fr; } }
+
+/* Media */
+.media { position: relative; background: #050d11; border-bottom: 1px solid var(--line); }
+.media video { display: block; width: 100%; height: auto; }
+.media figcaption, .mediafig figcaption { font-size: 0.82rem; color: var(--muted); line-height: 1.45; padding: 0.7rem 0 0; }
+.media-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 2rem); padding: 0 clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem); }
+@media (max-width: 760px) { .media-row { grid-template-columns: 1fr; } }
+.media-row figure, .mediafig { margin: 0; min-width: 0; }
+.media-row video, .zoomable { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-2); }
+.zoomable { cursor: zoom-in; }
+.vidwrap { position: relative; }
+.vidwrap .cap { position: absolute; top: 0.6rem; left: 0.6rem; font-family: var(--f-mono); font-size: 0.65rem; letter-spacing: 0.05em; text-transform: uppercase; color: #fff; background: rgba(5, 13, 17, 0.6); backdrop-filter: blur(6px); padding: 0.25rem 0.55rem; border-radius: 999px; pointer-events: none; }
+.card .thumb { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: center top; border-bottom: 1px solid var(--line); background: var(--bg-2); cursor: zoom-in; }
+
+/* Lightbox */
+.lightbox { position: fixed; inset: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 88%, black); backdrop-filter: blur(10px); padding: max(1rem, env(safe-area-inset-top, 0px)) 1rem 1rem; overflow: auto; cursor: zoom-out; }
+.lightbox img { display: block; margin: 0 auto; max-width: 100%; border-radius: 10px; background: #fff; }
+.lightbox .close { position: fixed; top: calc(0.75rem + env(safe-area-inset-top, 0px)); right: calc(0.75rem + env(safe-area-inset-right, 0px)); width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 1.1rem; line-height: 1; cursor: pointer; }
 
 .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
 @media (max-width: 960px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -270,17 +287,39 @@ footer a:hover { color: var(--ink); }
     </div>
 
     <article class="featured">
-      <div class="figslot">[Key figure, assets/nature2026.png]</div>
+      <div class="media vidwrap">
+        <video src="assets/nature-training.mp4" poster="assets/poster-training.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Three training conditions filmed from above: direct experience, observation, and a non-social control"></video>
+        <span class="cap">Training · EXP / OBS / NON · 1× speed</span>
+      </div>
       <div class="body">
-        <span class="tag nature">Nature · 2026</span>
-        <h3><a href="https://doi.org/10.1038/s41586-026-11217-9" target="_blank" rel="noopener">Aggression experience and observation drive shared behavioral and neural changes</a></h3>
-        <p class="authors"><b>Iravedra-García, J.M.</b>, Guthman, E.M., Cuturela, L., Ocasio-Arce, E.J., Pillow, J.W. &amp; Falkner, A.L.</p>
-        <p class="summary"><span class="todo">[Summary]</span></p>
+        <div class="lead-in">
+          <div>
+            <span class="tag nature">Nature · 2026</span>
+            <h3><a href="https://doi.org/10.1038/s41586-026-11217-9" target="_blank" rel="noopener">Aggression experience and observation drive shared behavioral and neural changes</a></h3>
+            <p class="authors"><b>Iravedra-García, J.M.</b>, Guthman, E.M., Cuturela, L., Ocasio-Arce, E.J., Pillow, J.W. &amp; Falkner, A.L.</p>
+            <p class="summary">Social species learn about conflict without taking part in it, but whether watching recruits the same neural machinery as doing was unknown. Over eight days, male mice gained experience either by direct interaction with a weaker opponent, by watching those encounters from behind a barrier, or with a non-social object, while we recorded excitatory and inhibitory populations simultaneously across twelve nodes of the social behavior network. Observers attended selectively to attacks, and during watching their network activity resembled that of experienced animals, with distinct signatures in regions associated with reward and threat learning. Facing an unfamiliar, harder opponent on day nine, observers and experienced animals both responded faster and spent less time disengaged than controls, without becoming more aggressive overall, and their behavioral transition structure converged. Network modeling identified a shared, persistent decoupling of inhibition from a key hypothalamic output region; chemogenetically restoring that inhibition returned behavior toward the naive pattern.</p>
+          </div>
+          <figure class="mediafig">
+            <img class="zoomable" src="assets/nature-fig1.png" alt="Figure 1: targeting twelve sites in the social behavior network, two-color photometry traces, and attack-aligned responses" loading="lazy">
+            <figcaption>Figure 1. Click to enlarge.</figcaption>
+          </figure>
+        </div>
         <div class="card-links">
           <a href="https://doi.org/10.1038/s41586-026-11217-9" target="_blank" rel="noopener">Paper</a>
           <a href="https://doi.org/10.1101/2024.12.26.630396" target="_blank" rel="noopener">Preprint</a>
           <a href="https://www.eurekalert.org/news-releases/1149964" target="_blank" rel="noopener">Press</a>
+          <a href="https://nautil.us/what-happened-when-neuroscientists-started-a-mouse-fight-club-1286353" target="_blank" rel="noopener">Nautilus</a>
         </div>
+      </div>
+      <div class="media-row">
+        <figure class="vidwrap">
+          <video src="assets/nature-recording.mp4" poster="assets/poster-recording.jpg" autoplay muted loop playsinline preload="none" aria-label="Simultaneous photometry traces from ten regions during free social behavior"></video>
+          <figcaption>Twelve-site photometry streaming during free behavior. Red and blue traces are the inhibitory and excitatory populations at each site; green is dopamine release in NAc.</figcaption>
+        </figure>
+        <figure>
+          <img class="zoomable" src="assets/poster-training.jpg" alt="The three training conditions side by side" loading="lazy">
+          <figcaption>The three training conditions. Observers (centre) see, hear and smell the encounter from a raised platform behind a clear barrier, with a dedicated camera on the observer.</figcaption>
+        </figure>
       </div>
     </article>
 
@@ -291,27 +330,27 @@ footer a:hover { color: var(--ink); }
           <span class="tag">JoVE · 2026 · Methods</span>
           <h3><a href="https://doi.org/10.3791/70049" target="_blank" rel="noopener">Two-color multifiber photometry recordings of the social behavior network in mice</a></h3>
           <p class="authors">Guthman, E.M.*, <b>Iravedra-García, J.M.*</b>, Cherepanova, P., Yokoyama, S., Lockwood, S.E., Oline, S.N. &amp; Falkner, A.L. *Equal contribution</p>
-          <p class="summary"><span class="todo">[Summary]</span></p>
+          <p class="summary">We describe how to build and implant custom multifiber arrays that record population calcium activity from up to 12 sites across the mouse social behavior network in a single freely moving animal. Green- and red-shifted calcium indicators let us record two genetically defined populations at every site simultaneously, imaged with a commercial CMOS-based photometry system during social behavior. The protocol covers implant fabrication and surgery, quality control, and a preprocessing pipeline for noise correction and standardization, taking a lab from bench to analysis-ready signals from deep brain structures.</p>
           <div class="card-links"><a href="https://doi.org/10.3791/70049" target="_blank" rel="noopener">Paper</a></div>
         </div>
       </article>
       <article class="card">
-        <div class="figslot">[Figure]</div>
+        <img class="thumb zoomable" src="assets/conb-fig.png" alt="Schematic: an observer watches a dominant and a subordinate, then updates its social structure and its inferred reward functions" loading="lazy">
         <div class="body">
           <span class="tag">Curr Opin Neurobiol · 2026 · Review</span>
           <h3><a href="https://doi.org/10.1016/j.conb.2026.103264" target="_blank" rel="noopener">Watching the watchers: aggression observation as a window into the neural mechanisms and computations underlying social learning</a></h3>
           <p class="authors">Tsin, D., <b>Iravedra-García, J.M.</b> &amp; Falkner, A.L.</p>
-          <p class="summary"><span class="todo">[Summary]</span></p>
+          <p class="summary">Watching others fight changes later behavior, and recent work shows that observation recruits subcortical systems for aggressive motivation, arousal and reward, beyond classic action-mirroring circuits. We argue that aggression observation is an unusually demanding form of social learning, because the observer must infer the distinct goals of a winner and a loser at once, and propose multi-agent and inverse reinforcement learning as frameworks for formalizing how watchers update their model of the social world.</p>
           <div class="card-links"><a href="https://doi.org/10.1016/j.conb.2026.103264" target="_blank" rel="noopener">Paper</a></div>
         </div>
       </article>
       <article class="card">
-        <div class="figslot">[Figure]</div>
+        <img class="thumb zoomable" src="assets/guthman-fig.png" alt="Recording ERα+ and ERα− populations across the social behavior network and the resulting context-specific activity maps" loading="lazy">
         <div class="body">
           <span class="tag">bioRxiv · 2025 · Preprint</span>
           <h3><a href="https://doi.org/10.1101/2025.09.24.678271" target="_blank" rel="noopener">Context rescales a social action code in a hormone-sensitive network</a></h3>
           <p class="authors">Guthman, E.M., <b>Iravedra-García, J.M.</b>, Sirrs, L., Le, A. &amp; Falkner, A.L.</p>
-          <p class="summary"><span class="todo">[Summary]</span></p>
+          <p class="summary">We recorded ERα+ and ERα− populations across the subcortical social behavior network while mice met different partners in different territories, and quantified behavior frame by frame without supervision. Each context produced a distinct pattern of social action, and territory linearly rescaled the partner-specific action code, amplifying behavior-associated activity at home. In males, gonadectomy disrupted home-territory behavior, which testosterone replacement rescued, and impaired territorial rescaling in a population-specific manner; these behavioral effects were absent in females.</p>
           <div class="card-links"><a href="https://doi.org/10.1101/2025.09.24.678271" target="_blank" rel="noopener">Preprint</a></div>
         </div>
       </article>
@@ -405,6 +444,37 @@ footer a:hover { color: var(--ink); }
     </ul>
   </div>
 </footer>
+
+<script>
+(function () {
+  // Pause autoplaying video when the viewer prefers reduced motion, and give every video controls.
+  var calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+  document.querySelectorAll("video").forEach(function (v) {
+    v.controls = true;
+    if (calm.matches) { v.autoplay = false; v.removeAttribute("autoplay"); v.pause(); }
+  });
+
+  // Click a figure to open it full size.
+  var box = null;
+  function close() { if (box) { box.remove(); box = null; document.removeEventListener("keydown", onKey); } }
+  function onKey(e) { if (e.key === "Escape") close(); }
+  document.addEventListener("click", function (e) {
+    var img = e.target.closest(".zoomable");
+    if (!img) return;
+    close();
+    box = document.createElement("div");
+    box.className = "lightbox";
+    box.innerHTML = '<button class="close" type="button" aria-label="Close">&times;</button>';
+    var big = new Image();
+    big.src = img.currentSrc || img.src;
+    big.alt = img.alt;
+    box.appendChild(big);
+    box.addEventListener("click", close);
+    document.body.appendChild(box);
+    document.addEventListener("keydown", onKey);
+  });
+})();
+</script>
 
 </body>
 </html>
