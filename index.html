@@ -3,14 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:type" content="profile">
 <meta property="og:title" content="Jorge Iravedra-García">
 <meta property="og:description" content="Systems and computational neuroscientist, Princeton Neuroscience Institute">
-<meta property="og:image" content="headshot.jpg">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="assets/og-card.png">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0c0e11" media="(prefers-color-scheme: dark)">
 <title>Jorge Iravedra-García</title>
 <meta name="description" content="Jorge M. Iravedra-García, systems neuroscientist and postdoctoral research associate at the Princeton Neuroscience Institute.">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="assets/icon.png" type="image/png" sizes="512x512">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
@@ -78,6 +85,8 @@ a:focus-visible, .btn:focus-visible { outline: 2px solid var(--turquoise); outli
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
+.skip { position: absolute; left: -9999px; top: 0; z-index: 60; background: var(--card); color: var(--ink); padding: 0.6rem 1rem; border: 1px solid var(--line); border-radius: 0 0 10px 0; }
+.skip:focus { left: 0; }
 .todo { background: var(--todo-bg); color: var(--todo-ink); border-radius: 6px; padding: 0.05em 0.35em; font-size: 0.92em; }
 
 /* ---------- Nav ---------- */
@@ -243,6 +252,7 @@ footer a:hover { color: var(--ink); }
 <body>
 
 
+<a class="skip" href="#top">Skip to content</a>
 <nav class="nav" aria-label="Primary">
   <div class="wrap">
     <a class="mark" href="#top">Jorge Iravedra-García</a>
@@ -305,7 +315,7 @@ footer a:hover { color: var(--ink); }
       <p>I am a postdoctoral research associate in the <a href="https://www.falknerlab.com/" target="_blank" rel="noopener">Falkner Lab</a> at the Princeton Neuroscience Institute, where I completed my PhD in 2026.</p>
       <p>I work on social cognition from the outside in: how the brain parses the observable features of others — what they are doing, who they are, how an encounter is going — and integrates that with internal state to arrive at a behavioral policy. Observation is a useful entry point, because a watcher has to track several individuals with opposing goals at once and work out what any of it means for itself. I approach this by recording brain-wide circuit activity in freely behaving mice and pairing it with unsupervised behavioral quantification and encoding models that link network dynamics to behavior frame by frame.</p>
       <p>My postdoctoral work turns that recording platform into a causal one. Adding galvanometer-steered optogenetic stimulation to the same fiber bundle lets me drive one population at a time while recording from every other site, which yields a signed, directed map of effective connections across the social behavior network in an animal that is awake and behaving. The question is whether experience and observation rewrite the causal weights themselves, not only the activity those weights carry.</p>
-      <p>I started in neuroscience as a BP-ENDURE fellow at the University of Puerto Rico, Río Piedras, in Gregory Quirk's lab, recording single units in behaving rats to work out how prefrontal projections control active avoidance. That program exists to open research careers to students like me, and the community of boricua neuroscientists it connected me to is a large part of why I am still here. <span class="todo">[edit this line to taste]</span></p>
+      <p>I started in neuroscience as a BP-ENDURE fellow at the University of Puerto Rico, Río Piedras, in Gregory Quirk's lab, recording single units in behaving rats to work out how prefrontal projections control active avoidance. That program exists to open research careers to students like me, and the community of boricua neuroscientists it connected me to is a large part of why I am still here.</p>
     </div>
   </div>
 </section>
@@ -331,7 +341,7 @@ footer a:hover { color: var(--ink); }
             <p class="summary">Social species learn about conflict without taking part in it, but whether watching recruits the same neural machinery as doing was unknown. Over eight days, male mice gained experience either by direct interaction with a weaker opponent, by watching those encounters from behind a barrier, or with a non-social object, while we recorded excitatory and inhibitory populations simultaneously across twelve nodes of the social behavior network. Observers attended selectively to attacks, and during watching their network activity resembled that of experienced animals, with distinct signatures in regions associated with reward and threat learning. Facing an unfamiliar, harder opponent on day nine, observers and experienced animals both responded faster and spent less time disengaged than controls, without becoming more aggressive overall, and their behavioral transition structure converged. Network modeling identified a shared, persistent decoupling of inhibition from a key hypothalamic output region; chemogenetically restoring that inhibition returned behavior toward the naive pattern.</p>
           </div>
           <figure class="mediafig">
-            <img class="zoomable" src="assets/nature-fig1.png" alt="Figure 1: targeting twelve sites in the social behavior network, two-color photometry traces, and attack-aligned responses" loading="lazy">
+            <img class="zoomable" src="assets/nature-fig1-thumb.png" data-full="assets/nature-fig1.png" alt="Figure 1: targeting twelve sites in the social behavior network, two-color photometry traces, and attack-aligned responses" loading="lazy">
             <figcaption>Figure 1. Click to enlarge.</figcaption>
           </figure>
         </div>
@@ -340,6 +350,7 @@ footer a:hover { color: var(--ink); }
           <a href="https://doi.org/10.1101/2024.12.26.630396" target="_blank" rel="noopener">Preprint</a>
           <a href="https://pni.princeton.edu/news/2026/mice-watch-fights-come-away-battle-ready" target="_blank" rel="noopener">Press</a>
           <a href="https://nautil.us/what-happened-when-neuroscientists-started-a-mouse-fight-club-1286353" target="_blank" rel="noopener">Nautilus</a>
+          <a href="https://arstechnica.com/science/2026/11/watching-mouse-fight-club-teaches-the-critters-how-to-fight/" target="_blank" rel="noopener">Ars Technica</a>
           <a href="#listen">NPR segment</a>
         </div>
       </div>
@@ -487,7 +498,7 @@ footer a:hover { color: var(--ink); }
     box.className = "lightbox";
     box.innerHTML = '<button class="close" type="button" aria-label="Close">&times;</button>';
     var big = new Image();
-    big.src = img.currentSrc || img.src;
+    big.src = img.dataset.full || img.currentSrc || img.src;
     big.alt = img.alt;
     box.appendChild(big);
     box.addEventListener("click", close);
@@ -553,6 +564,10 @@ footer a:hover { color: var(--ink); }
   else window.addEventListener("resize", draw);
   tick();
 })();
+</script>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Jorge M. Iravedra-García","givenName":"Jorge","familyName":"Iravedra-García","jobTitle":"Postdoctoral Research Associate","email":"mailto:jmig@princeton.edu","affiliation":{"@type":"Organization","name":"Princeton Neuroscience Institute, Princeton University"},"alumniOf":[{"@type":"Organization","name":"Princeton University"},{"@type":"Organization","name":"University of Puerto Rico, Río Piedras"}],"knowsAbout":["systems neuroscience","social behavior","fiber photometry","computational neuroscience"],"sameAs":["https://scholar.google.com/citations?user=jb-Dg9sAAAAJ&hl=en","https://github.com/jorgeiravedra","https://www.linkedin.com/in/jorge-iravedra-garc%C3%ADa-phd-3a0264169/"]}
 </script>
 
 </body>
