@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:title" content="Jorge Iravedra-García">
-<meta property="og:description" content="Systems neuroscientist, Princeton Neuroscience Institute">
+<meta property="og:description" content="Systems and computational neuroscientist, Princeton Neuroscience Institute">
 <meta property="og:image" content="headshot.jpg">
 <meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#07141b" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0c0e11" media="(prefers-color-scheme: dark)">
 <title>Jorge Iravedra-García</title>
 <meta name="description" content="Jorge M. Iravedra-García, systems neuroscientist and postdoctoral research associate at the Princeton Neuroscience Institute.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,18 +19,16 @@
    Palette: flamboyán (coral-red) and Caribbean turquoise on clean white; tropical-night ocean navy in dark mode. */
 :root {
   --bg: #ffffff;
-  --bg-2: #eef4fa;
-  --wash-1: #ffffff;
-  --wash-2: #dceaf5;
+  --bg-2: #f6f6f7;
   --card: #ffffff;
-  --ink: #0d1a21;
-  --muted: #5b6c74;
-  --line: #e0e8ee;
-  --link: #087f80;
-  --flamboyan: #e5482f;
-  --mango: #f2a93b;
-  --turquoise: #0b9a9a;
-  --btn-bg: #0d1a21;
+  --ink: #16191c;
+  --muted: #5f666d;
+  --line: #e5e6e8;
+  --link: #0b4fa0;
+  --flamboyan: #e8112d;
+  --mango: #f0a21f;
+  --turquoise: #0b4fa0;
+  --btn-bg: #16191c;
   --btn-ink: #ffffff;
   --nav-bg: rgba(255, 255, 255, 0.72);
   --todo-bg: #fff1dc;
@@ -43,20 +41,20 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #07141b; --bg-2: #0c1e27; --wash-1: #07141b; --wash-2: #0d2733; --card: #0f2530;
-    --ink: #edf4f5; --muted: #93a8b0; --line: #1b3340;
-    --link: #45d1c8; --flamboyan: #ff6a4d; --mango: #ffc25a; --turquoise: #45d1c8;
-    --btn-bg: #edf4f5; --btn-ink: #07141b; --nav-bg: rgba(7, 20, 27, 0.7);
+    --bg: #0c0e11; --bg-2: #15181c; --card: #15181c;
+    --ink: #eceef0; --muted: #9aa2a9; --line: #272b31;
+    --link: #74a9f0; --flamboyan: #ff4d5e; --mango: #ffbb47; --turquoise: #74a9f0;
+    --btn-bg: #eceef0; --btn-ink: #0c0e11; --nav-bg: rgba(12, 14, 17, 0.72);
     --todo-bg: #3b2a10; --todo-ink: #ffd18a;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 40px -16px rgba(0, 0, 0, 0.6);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #07141b; --bg-2: #0c1e27; --wash-1: #07141b; --wash-2: #0d2733; --card: #0f2530;
-  --ink: #edf4f5; --muted: #93a8b0; --line: #1b3340;
-  --link: #45d1c8; --flamboyan: #ff6a4d; --mango: #ffc25a; --turquoise: #45d1c8;
-  --btn-bg: #edf4f5; --btn-ink: #07141b; --nav-bg: rgba(7, 20, 27, 0.7);
+  --bg: #0c0e11; --bg-2: #15181c; --card: #15181c;
+  --ink: #eceef0; --muted: #9aa2a9; --line: #272b31;
+  --link: #74a9f0; --flamboyan: #ff4d5e; --mango: #ffbb47; --turquoise: #74a9f0;
+  --btn-bg: #eceef0; --btn-ink: #0c0e11; --nav-bg: rgba(12, 14, 17, 0.72);
   --todo-bg: #3b2a10; --todo-ink: #ffd18a;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 40px -16px rgba(0, 0, 0, 0.6);
   color-scheme: dark;
@@ -67,15 +65,10 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body {
   margin: 0;
-  background-color: var(--bg); color: var(--ink);
-  background-image: linear-gradient(172deg, var(--wash-1) 0%, var(--wash-2) 38%, var(--wash-1) 62%, var(--wash-2) 100%);
-  background-attachment: fixed; background-size: 100% 260%; background-position: 50% 0%;
-  animation: tide 24s ease-in-out infinite alternate;
+  background: var(--bg); color: var(--ink);
   font-family: var(--f-sans); font-size: 1.0625rem; line-height: 1.6;
   -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
 }
-@keyframes tide { from { background-position: 50% 0%; } to { background-position: 50% 100%; } }
-@media (prefers-reduced-motion: reduce) { body { animation: none; background-position: 50% 35%; } }
 a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
 a:focus-visible, .btn:focus-visible { outline: 2px solid var(--turquoise); outline-offset: 3px; border-radius: 8px; }
@@ -122,10 +115,10 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .portrait-wrap { position: relative; justify-self: end; width: min(100%, 24rem); }
 .portrait-wrap::before {
   content: ""; position: absolute; inset: -6%; z-index: 0; border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%;
-  background: radial-gradient(60% 60% at 30% 30%, color-mix(in srgb, var(--mango) 55%, transparent), transparent 70%),
-              radial-gradient(60% 60% at 75% 70%, color-mix(in srgb, var(--turquoise) 45%, transparent), transparent 70%),
-              radial-gradient(50% 50% at 70% 20%, color-mix(in srgb, var(--flamboyan) 40%, transparent), transparent 70%);
-  filter: blur(28px); opacity: 0.85;
+  background: radial-gradient(58% 58% at 26% 24%, color-mix(in srgb, var(--mango) 62%, transparent), transparent 72%),
+              radial-gradient(58% 58% at 78% 30%, color-mix(in srgb, var(--flamboyan) 52%, transparent), transparent 72%),
+              radial-gradient(60% 60% at 58% 82%, color-mix(in srgb, var(--turquoise) 48%, transparent), transparent 72%);
+  filter: blur(30px); opacity: 0.8;
 }
 .portrait { position: relative; z-index: 1; display: block; width: 100%; max-width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 32px; box-shadow: var(--shadow); }
 
@@ -136,7 +129,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 }
 
 /* ---------- Figures strip ---------- */
-.band { background: color-mix(in srgb, var(--bg-2) 70%, transparent); border-block: 1px solid var(--line); }
+.band { background: var(--bg-2); border-block: 1px solid var(--line); }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; padding-block: clamp(2.5rem, 5vw, 3.5rem); }
 .stat { padding: 0.25rem 0; }
 .stat .num { font-size: clamp(2.4rem, 1.6rem + 3vw, 3.75rem); font-weight: 600; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -194,7 +187,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   aspect-ratio: 16 / 10; max-width: 100%; display: grid; place-items: center; text-align: center; padding: 1rem;
   font-family: var(--f-mono); font-size: 0.75rem; color: var(--muted);
   background:
-    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--turquoise) 14%, transparent), transparent 60%),
+    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--mango) 16%, transparent), transparent 60%),
     radial-gradient(120% 90% at 100% 100%, color-mix(in srgb, var(--flamboyan) 12%, transparent), transparent 60%),
     var(--bg-2);
   border-bottom: 1px solid var(--line);
@@ -253,7 +246,7 @@ footer a:hover { color: var(--ink); }
     <div>
       <p class="eyebrow">Princeton Neuroscience Institute · Falkner Lab</p>
       <h1>Jorge <span class="accent">Iravedra-García</span></h1>
-      <p class="lede"><strong>Systems neuroscientist.</strong> I build optical tools to record brain-wide circuits for social behavior in freely moving mice. <span class="todo">[edit tagline]</span></p>
+      <p class="lede"><strong>Systems and computational neuroscientist.</strong> I build optical tools to record brain-wide circuits in freely moving mice, and models that tie network dynamics to the structure of social behavior.</p>
       <div class="ctas">
         <a class="btn btn-primary" href="#research">See the research</a>
         <a class="btn btn-ghost" href="https://scholar.google.com/citations?user=jb-Dg9sAAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar
@@ -279,9 +272,9 @@ footer a:hover { color: var(--ink); }
     <h2>About</h2>
     <div class="about-body">
       <p>I am a postdoctoral research associate in the <a href="https://www.falknerlab.com/" target="_blank" rel="noopener">Falkner Lab</a> at the Princeton Neuroscience Institute, where I completed my PhD in 2026.</p>
-      <p><span class="todo">[Research statement: the question you study and your approach, 2–3 sentences]</span></p>
-      <p><span class="todo">[Current postdoctoral direction]</span></p>
-      <p><span class="todo">[Background: University of Puerto Rico, Río Piedras; Quirk Lab; path into neuroscience]</span></p>
+      <p>I work on social cognition from the outside in: how the brain parses the observable features of others — what they are doing, who they are, how an encounter is going — and integrates that with internal state to arrive at a behavioral policy. Observation is a useful entry point, because a watcher has to track several individuals with opposing goals at once and work out what any of it means for itself. I approach this by recording brain-wide circuit activity in freely behaving mice and pairing it with unsupervised behavioral quantification and encoding models that link network dynamics to behavior frame by frame.</p>
+      <p>My postdoctoral work turns that recording platform into a causal one. Adding galvanometer-steered optogenetic stimulation to the same fiber bundle lets me drive one population at a time while recording from every other site, which yields a signed, directed map of effective connections across the social behavior network in an animal that is awake and behaving. The question is whether experience and observation rewrite the causal weights themselves, not only the activity those weights carry.</p>
+      <p>I started in neuroscience as a BP-ENDURE fellow at the University of Puerto Rico, Río Piedras, in Gregory Quirk's lab, recording single units in behaving rats to work out how prefrontal projections control active avoidance. That program exists to open research careers to students like me, and the community of boricua neuroscientists it connected me to is a large part of why I am still here. <span class="todo">[edit this line to taste]</span></p>
       <p><span class="todo">[Optional personal paragraph]</span></p>
     </div>
   </div>
@@ -415,14 +408,6 @@ footer a:hover { color: var(--ink); }
           <li class="entry"><span class="when">2024</span><span class="what">PNI Annual Retreat<span class="sub">Talk · Best Talk Award</span></span></li>
           <li class="entry"><span class="when">2022, 2023</span><span class="what">Society for Neuroscience<span class="sub">Poster</span></span></li>
           <li class="entry"><span class="when">2018</span><span class="what">SACNAS National Conference<span class="sub">Talk / poster</span></span></li>
-        </ul>
-      </div>
-      <div class="panel">
-        <h3>Mentoring &amp; service</h3>
-        <ul class="entries">
-          <li class="entry"><span class="when">2022 – now</span><span class="what">Graduate student mentor (2 students)<span class="sub">Photometry hardware, stereotaxic surgery, analysis pipelines</span></span></li>
-          <li class="entry"><span class="when"><span class="todo">[years]</span></span><span class="what">Abstract reviewer, Society for Neuroscience</span></li>
-          <li class="entry"><span class="when"><span class="todo">[years]</span></span><span class="what">PNI Graduate Student Committee</span></li>
         </ul>
       </div>
       <div class="panel">
