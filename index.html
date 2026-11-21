@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:title" content="Jorge Iravedra-García">
+<meta property="og:description" content="Systems neuroscientist, Princeton Neuroscience Institute">
+<meta property="og:image" content="headshot.jpg">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07141b" media="(prefers-color-scheme: dark)">
+<title>Jorge Iravedra-García</title>
+<meta name="description" content="Jorge M. Iravedra-García, systems neuroscientist and postdoctoral research associate at the Princeton Neuroscience Institute.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single-scroll product page. Sticky translucent nav → hero (name + portrait) → figures strip → research cards → CV → footer.
+   Palette: flamboyán (coral-red) and Caribbean turquoise on clean white; tropical-night ocean navy in dark mode. */
+:root {
+  --bg: #ffffff;
+  --bg-2: #f2f7f7;
+  --card: #ffffff;
+  --ink: #0d1a21;
+  --muted: #5b6c74;
+  --line: #e1e9eb;
+  --link: #087f80;
+  --flamboyan: #e5482f;
+  --mango: #f2a93b;
+  --turquoise: #0b9a9a;
+  --btn-bg: #0d1a21;
+  --btn-ink: #ffffff;
+  --nav-bg: rgba(255, 255, 255, 0.72);
+  --todo-bg: #fff1dc;
+  --todo-ink: #8a4b00;
+  --shadow: 0 1px 2px rgba(13, 26, 33, 0.04), 0 12px 32px -12px rgba(13, 26, 33, 0.12);
+  --f-sans: "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --max: 72rem;
+  --radius: 22px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #07141b; --bg-2: #0c1e27; --card: #0f2530; --ink: #edf4f5; --muted: #93a8b0; --line: #1b3340;
+    --link: #45d1c8; --flamboyan: #ff6a4d; --mango: #ffc25a; --turquoise: #45d1c8;
+    --btn-bg: #edf4f5; --btn-ink: #07141b; --nav-bg: rgba(7, 20, 27, 0.7);
+    --todo-bg: #3b2a10; --todo-ink: #ffd18a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 40px -16px rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #07141b; --bg-2: #0c1e27; --card: #0f2530; --ink: #edf4f5; --muted: #93a8b0; --line: #1b3340;
+  --link: #45d1c8; --flamboyan: #ff6a4d; --mango: #ffc25a; --turquoise: #45d1c8;
+  --btn-bg: #edf4f5; --btn-ink: #07141b; --nav-bg: rgba(7, 20, 27, 0.7);
+  --todo-bg: #3b2a10; --todo-ink: #ffd18a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 40px -16px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-sans); font-size: 1.0625rem; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+a:focus-visible, .btn:focus-visible { outline: 2px solid var(--turquoise); outline-offset: 3px; border-radius: 8px; }
+
+.wrap {
+  max-width: calc(var(--max) + 2rem); margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.todo { background: var(--todo-bg); color: var(--todo-ink); border-radius: 6px; padding: 0.05em 0.35em; font-size: 0.92em; }
+
+/* ---------- Nav ---------- */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.nav {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9;
+  background: var(--nav-bg); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--line);
+}
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: 3.25rem; }
+.nav .mark { font-weight: 600; font-size: 0.98rem; color: var(--ink); letter-spacing: -0.01em; white-space: nowrap; }
+.nav .mark:hover { text-decoration: none; }
+.nav ul { list-style: none; display: flex; gap: clamp(0.9rem, 3vw, 2rem); margin: 0; padding: 0; }
+.nav ul a { font-size: 0.86rem; color: var(--muted); }
+.nav ul a:hover { color: var(--ink); text-decoration: none; }
+
+/* ---------- Hero ---------- */
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center; padding-block: clamp(3.5rem, 9vw, 7.5rem) clamp(3rem, 7vw, 6rem); }
+.eyebrow { font-family: var(--f-mono); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 1.25rem; display: flex; align-items: center; gap: 0.6rem; }
+.eyebrow::before { content: ""; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--turquoise); box-shadow: 0 0 0 4px color-mix(in srgb, var(--turquoise) 20%, transparent); }
+.hero h1 {
+  font-size: clamp(2.9rem, 1.6rem + 5.6vw, 6rem); line-height: 0.98; letter-spacing: -0.045em; font-weight: 600;
+  margin: 0 0 1.5rem; text-wrap: balance;
+}
+.hero h1 .accent { background: linear-gradient(100deg, var(--flamboyan) 10%, var(--mango) 95%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lede { font-size: clamp(1.15rem, 1rem + 0.6vw, 1.45rem); line-height: 1.45; color: var(--muted); letter-spacing: -0.01em; max-width: 34ch; margin: 0 0 2rem; text-wrap: pretty; }
+.lede strong { color: var(--ink); font-weight: 500; }
+.ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.btn { display: inline-flex; align-items: center; gap: 0.45rem; height: 2.75rem; padding: 0 1.3rem; border-radius: 999px; font-size: 0.95rem; font-weight: 500; transition: transform 0.15s ease, opacity 0.15s ease; }
+.btn:hover { text-decoration: none; transform: translateY(-1px); }
+.btn-primary { background: var(--btn-bg); color: var(--btn-ink); }
+.btn-ghost { color: var(--ink); border: 1px solid var(--line); background: var(--card); }
+.btn svg { width: 0.95rem; height: 0.95rem; }
+
+.portrait-wrap { position: relative; justify-self: end; width: min(100%, 24rem); }
+.portrait-wrap::before {
+  content: ""; position: absolute; inset: -6%; z-index: 0; border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%;
+  background: radial-gradient(60% 60% at 30% 30%, color-mix(in srgb, var(--mango) 55%, transparent), transparent 70%),
+              radial-gradient(60% 60% at 75% 70%, color-mix(in srgb, var(--turquoise) 45%, transparent), transparent 70%),
+              radial-gradient(50% 50% at 70% 20%, color-mix(in srgb, var(--flamboyan) 40%, transparent), transparent 70%);
+  filter: blur(28px); opacity: 0.85;
+}
+.portrait { position: relative; z-index: 1; display: block; width: 100%; max-width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 32px; box-shadow: var(--shadow); }
+
+@media (max-width: 760px) {
+  .hero .wrap { grid-template-columns: 1fr; }
+  .portrait-wrap { order: -1; justify-self: start; width: 9rem; }
+  .portrait { border-radius: 24px; }
+}
+
+/* ---------- Figures strip ---------- */
+.band { background: var(--bg-2); border-block: 1px solid var(--line); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; padding-block: clamp(2.5rem, 5vw, 3.5rem); }
+.stat { padding: 0.25rem 0; }
+.stat .num { font-size: clamp(2.4rem, 1.6rem + 3vw, 3.75rem); font-weight: 600; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat:nth-child(1) .num { color: var(--flamboyan); }
+.stat:nth-child(2) .num { color: var(--turquoise); }
+.stat:nth-child(3) .num { color: var(--mango); }
+.stat p { margin: 0.6rem 0 0; color: var(--muted); font-size: 0.95rem; max-width: 24ch; }
+@media (max-width: 640px) { .stats { grid-template-columns: 1fr; gap: 1.75rem; } }
+
+/* ---------- Sections ---------- */
+.section { padding-block: clamp(4rem, 9vw, 7rem); }
+.section-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem 2rem; margin-bottom: clamp(2rem, 4vw, 3rem); }
+.section-head h2 { font-size: clamp(2.1rem, 1.4rem + 2.8vw, 3.5rem); line-height: 1.04; letter-spacing: -0.04em; font-weight: 600; margin: 0; text-wrap: balance; }
+.section-head p { margin: 0; color: var(--muted); max-width: 38ch; }
+
+/* About */
+.about { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: clamp(1.5rem, 4vw, 4rem); }
+.about h2 { font-size: clamp(2.1rem, 1.4rem + 2.8vw, 3.5rem); line-height: 1.04; letter-spacing: -0.04em; font-weight: 600; margin: 0; }
+.about-body p { font-size: 1.12rem; line-height: 1.65; margin: 0 0 1.15rem; max-width: 62ch; }
+@media (max-width: 760px) { .about { grid-template-columns: 1fr; } }
+
+/* Research cards */
+.featured {
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 0;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+  margin-bottom: 1.25rem;
+}
+.featured .figslot { border-radius: 0; border: 0; border-right: 1px solid var(--line); min-height: 22rem; aspect-ratio: auto; }
+.featured .body { padding: clamp(1.5rem, 3vw, 2.5rem); min-width: 0; display: flex; flex-direction: column; }
+@media (max-width: 860px) { .featured { grid-template-columns: 1fr; } .featured .figslot { border-right: 0; border-bottom: 1px solid var(--line); min-height: 14rem; } }
+
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+@media (max-width: 960px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.card .body { padding: 1.4rem 1.4rem 1.5rem; display: flex; flex-direction: column; flex: 1; }
+
+.figslot {
+  aspect-ratio: 16 / 10; max-width: 100%; display: grid; place-items: center; text-align: center; padding: 1rem;
+  font-family: var(--f-mono); font-size: 0.75rem; color: var(--muted);
+  background:
+    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--turquoise) 14%, transparent), transparent 60%),
+    radial-gradient(120% 90% at 100% 100%, color-mix(in srgb, var(--flamboyan) 12%, transparent), transparent 60%),
+    var(--bg-2);
+  border-bottom: 1px solid var(--line);
+}
+.tag { align-self: flex-start; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.3rem 0.6rem; border-radius: 999px; margin-bottom: 0.9rem; border: 1px solid var(--line); color: var(--muted); }
+.tag.nature { color: var(--flamboyan); border-color: color-mix(in srgb, var(--flamboyan) 40%, transparent); background: color-mix(in srgb, var(--flamboyan) 8%, transparent); }
+.card h3, .featured h3 { font-weight: 600; letter-spacing: -0.02em; line-height: 1.22; margin: 0 0 0.6rem; text-wrap: balance; }
+.featured h3 { font-size: clamp(1.4rem, 1.1rem + 1vw, 1.85rem); }
+.card h3 { font-size: 1.12rem; }
+.card h3 a, .featured h3 a { color: var(--ink); }
+.authors { font-size: 0.86rem; color: var(--muted); margin: 0 0 1rem; line-height: 1.5; }
+.authors b { color: var(--ink); font-weight: 600; }
+.summary { margin: 0 0 1.25rem; font-size: 0.98rem; }
+.card-links { margin-top: auto; display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; font-size: 0.88rem; font-weight: 500; }
+.card-links a::after { content: " ↗"; }
+
+/* CV */
+.cv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.cv .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.4rem, 3vw, 2rem); min-width: 0; }
+.cv .wide { grid-column: 1 / -1; }
+@media (max-width: 760px) { .cv { grid-template-columns: 1fr; } }
+.panel h3 { font-family: var(--f-mono); font-size: 0.76rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin: 0 0 1.1rem; }
+.entries { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+.entry { display: grid; grid-template-columns: 6.25rem minmax(0, 1fr); gap: 1rem; }
+.entry .when { font-family: var(--f-mono); font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 0.15rem; }
+.entry .what { min-width: 0; font-size: 0.96rem; line-height: 1.5; }
+.entry .what strong { font-weight: 600; }
+.entry .sub { color: var(--muted); font-size: 0.88rem; display: block; margin-top: 0.15rem; }
+.me { font-weight: 600; color: var(--ink); }
+@media (max-width: 480px) { .entry { grid-template-columns: 1fr; gap: 0.15rem; } }
+
+/* Footer */
+footer { border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 2rem 2.75rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem 2rem; font-size: 0.86rem; color: var(--muted); }
+footer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; }
+footer a { color: var(--muted); }
+footer a:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+
+
+<nav class="nav" aria-label="Primary">
+  <div class="wrap">
+    <a class="mark" href="#top">Jorge Iravedra-García</a>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#cv">CV</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Princeton Neuroscience Institute · Falkner Lab</p>
+      <h1>Jorge <span class="accent">Iravedra-García</span></h1>
+      <p class="lede"><strong>Systems neuroscientist.</strong> I build optical tools to record brain-wide circuits for social behavior in freely moving mice. <span class="todo">[edit tagline]</span></p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="#research">See the research</a>
+        <a class="btn btn-ghost" href="https://scholar.google.com/citations?user=jb-Dg9sAAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a>
+      </div>
+    </div>
+    <div class="portrait-wrap">
+      <img class="portrait" src="headshot.jpg" alt="Portrait of Jorge Iravedra-García" width="400" height="400">
+    </div>
+  </div>
+</header>
+
+<section class="band" aria-label="Recording platform at a glance">
+  <div class="wrap stats">
+    <div class="stat"><div class="num">12</div><p>optical fibers in a single custom implant</p></div>
+    <div class="stat"><div class="num">23</div><p>genetically identified populations recorded per animal</p></div>
+    <div class="stat"><div class="num">500+</div><p>longitudinal recording sessions</p></div>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="wrap about">
+    <h2>About</h2>
+    <div class="about-body">
+      <p>I am a postdoctoral research associate in the <a href="https://www.falknerlab.com/" target="_blank" rel="noopener">Falkner Lab</a> at the Princeton Neuroscience Institute, where I completed my PhD in 2026.</p>
+      <p><span class="todo">[Research statement: the question you study and your approach, 2–3 sentences]</span></p>
+      <p><span class="todo">[Current postdoctoral direction]</span></p>
+      <p><span class="todo">[Background: University of Puerto Rico, Río Piedras; Quirk Lab; path into neuroscience]</span></p>
+      <p><span class="todo">[Optional personal paragraph]</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="section band" id="research">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Research</h2>
+      <p>Selected publications. Full list on the <a href="#cv">CV</a> and <a href="https://scholar.google.com/citations?user=jb-Dg9sAAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar</a>.</p>
+    </div>
+
+    <article class="featured">
+      <div class="figslot">[Key figure, assets/nature2026.png]</div>
+      <div class="body">
+        <span class="tag nature">Nature · 2026</span>
+        <h3><a href="https://doi.org/10.1038/s41586-026-11217-9" target="_blank" rel="noopener">Aggression experience and observation drive shared behavioral and neural changes</a></h3>
+        <p class="authors"><b>Iravedra-García, J.M.</b>, Guthman, E.M., Cuturela, L., Ocasio-Arce, E.J., Pillow, J.W. &amp; Falkner, A.L.</p>
+        <p class="summary"><span class="todo">[Summary]</span></p>
+        <div class="card-links">
+          <a href="https://doi.org/10.1038/s41586-026-11217-9" target="_blank" rel="noopener">Paper</a>
+          <a href="https://doi.org/10.1101/2024.12.26.630396" target="_blank" rel="noopener">Preprint</a>
+          <a href="https://www.eurekalert.org/news-releases/1149964" target="_blank" rel="noopener">Press</a>
+        </div>
+      </div>
+    </article>
+
+    <div class="grid">
+      <article class="card">
+        <div class="figslot">[Figure, assets/jove2026.png]</div>
+        <div class="body">
+          <span class="tag">JoVE · 2026 · Methods</span>
+          <h3><a href="https://doi.org/10.3791/70049" target="_blank" rel="noopener">Two-color multifiber photometry recordings of the social behavior network in mice</a></h3>
+          <p class="authors">Guthman, E.M.*, <b>Iravedra-García, J.M.*</b>, Cherepanova, P., Yokoyama, S., Lockwood, S.E., Oline, S.N. &amp; Falkner, A.L. *Equal contribution</p>
+          <p class="summary"><span class="todo">[Summary]</span></p>
+          <div class="card-links"><a href="https://doi.org/10.3791/70049" target="_blank" rel="noopener">Paper</a></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="figslot">[Figure]</div>
+        <div class="body">
+          <span class="tag">Curr Opin Neurobiol · 2026 · Review</span>
+          <h3><a href="https://doi.org/10.1016/j.conb.2026.103264" target="_blank" rel="noopener">Watching the watchers: aggression observation as a window into the neural mechanisms and computations underlying social learning</a></h3>
+          <p class="authors">Tsin, D., <b>Iravedra-García, J.M.</b> &amp; Falkner, A.L.</p>
+          <p class="summary"><span class="todo">[Summary]</span></p>
+          <div class="card-links"><a href="https://doi.org/10.1016/j.conb.2026.103264" target="_blank" rel="noopener">Paper</a></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="figslot">[Figure]</div>
+        <div class="body">
+          <span class="tag">bioRxiv · 2025 · Preprint</span>
+          <h3><a href="https://doi.org/10.1101/2025.09.24.678271" target="_blank" rel="noopener">Context rescales a social action code in a hormone-sensitive network</a></h3>
+          <p class="authors">Guthman, E.M., <b>Iravedra-García, J.M.</b>, Sirrs, L., Le, A. &amp; Falkner, A.L.</p>
+          <p class="summary"><span class="todo">[Summary]</span></p>
+          <div class="card-links"><a href="https://doi.org/10.1101/2025.09.24.678271" target="_blank" rel="noopener">Preprint</a></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="cv">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>CV</h2>
+      <p><a href="mailto:jmig@princeton.edu">jmig@princeton.edu</a> · <span class="todo">[PDF CV link]</span></p>
+    </div>
+
+    <div class="cv">
+      <div class="panel">
+        <h3>Experience</h3>
+        <ul class="entries">
+          <li class="entry"><span class="when">2026 – now</span><span class="what"><strong>Postdoctoral research associate</strong><span class="sub">Falkner Lab, Princeton Neuroscience Institute</span></span></li>
+          <li class="entry"><span class="when">2020 – 2026</span><span class="what"><strong>Graduate researcher</strong><span class="sub">Falkner Lab, Princeton Neuroscience Institute</span></span></li>
+          <li class="entry"><span class="when">2017 – 2019</span><span class="what"><strong>Undergraduate researcher</strong><span class="sub">Quirk Lab, University of Puerto Rico School of Medicine</span></span></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Education</h3>
+        <ul class="entries">
+          <li class="entry"><span class="when"><span class="todo">[start]</span> – 2026</span><span class="what"><strong>Ph.D., Neuroscience</strong>, Princeton University<span class="sub">Dissertation: <i>Brain-wide neural mechanisms underlying the observational learning of aggression</i>. Advisor: Annegret Falkner</span></span></li>
+          <li class="entry"><span class="when">2022</span><span class="what"><strong>M.A., Neuroscience</strong>, Princeton University</span></li>
+          <li class="entry"><span class="when">2015 – 2019</span><span class="what"><strong>B.S., Molecular and Cellular Biology</strong><span class="sub">University of Puerto Rico, Río Piedras</span></span></li>
+        </ul>
+      </div>
+
+      <div class="panel wide">
+        <h3>Publications</h3>
+        <ul class="entries">
+          <li class="entry"><span class="when">2026</span><span class="what"><span class="me">Iravedra-García JM</span>, Guthman EM, Cuturela L, Ocasio-Arce EJ, Pillow JW, Falkner AL. <a href="https://doi.org/10.1038/s41586-026-11217-9" target="_blank" rel="noopener">Aggression experience and observation drive shared behavioral and neural changes.</a> <i>Nature</i>.</span></li>
+          <li class="entry"><span class="when">2026</span><span class="what">Guthman EM*, <span class="me">Iravedra-García JM*</span>, Cherepanova P, Yokoyama S, Lockwood SE, Oline SN, Falkner AL. <a href="https://doi.org/10.3791/70049" target="_blank" rel="noopener">Two-color multifiber photometry recordings of the social behavior network in mice.</a> <i>J Vis Exp</i> (229), e70049. *Equal contribution.</span></li>
+          <li class="entry"><span class="when">2026</span><span class="what">Tsin D, <span class="me">Iravedra-García JM</span>, Falkner AL. <a href="https://doi.org/10.1016/j.conb.2026.103264" target="_blank" rel="noopener">Watching the watchers: aggression observation as a window into the neural mechanisms and computations underlying social learning.</a> <i>Curr Opin Neurobiol</i> 101, 103264.</span></li>
+          <li class="entry"><span class="when">2025</span><span class="what">Guthman EM, <span class="me">Iravedra-García JM</span>, Sirrs L, Le A, Falkner AL. <a href="https://doi.org/10.1101/2025.09.24.678271" target="_blank" rel="noopener">Context rescales a social action code in a hormone-sensitive network.</a> <i>bioRxiv</i>.</span></li>
+          <li class="entry"><span class="when">2022</span><span class="what">Bolkan SS, Stone IR, Pinto L, …, <span class="me">Iravedra-García JM</span>, …, Witten IB. <a href="https://pubmed.ncbi.nlm.nih.gov/35260863/" target="_blank" rel="noopener">Opponent control of behavior by dorsomedial striatal pathways depends on task demands and internal state.</a> <i>Nat Neurosci</i> 25, 345–357.</span></li>
+          <li class="entry"><span class="when">2020</span><span class="what">Diehl MM, <span class="me">Iravedra-García JM</span>, Morán-Sierra J, Robles-Colón M, Laboy-Rodríguez S, Torres-Díaz YM, Quirk GJ. <a href="https://doi.org/10.7554/eLife.59281" target="_blank" rel="noopener">Divergent projections of the prelimbic cortex bidirectionally regulate active avoidance.</a> <i>eLife</i> 9, e59281.</span></li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Fellowships &amp; awards</h3>
+        <ul class="entries">
+          <li class="entry"><span class="when">2024</span><span class="what">Best Talk Award, PNI Annual Retreat</span></li>
+          <li class="entry"><span class="when">2020</span><span class="what">NSF GRFP, Honorable Mention</span></li>
+          <li class="entry"><span class="when">2019</span><span class="what">President's Fellowship, Princeton University</span></li>
+          <li class="entry"><span class="when">2017 – 2019</span><span class="what">NIH BP-ENDURE Fellowship, University of Puerto Rico</span></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Presentations</h3>
+        <ul class="entries">
+          <li class="entry"><span class="when">2025</span><span class="what">Cosyne, Montréal<span class="sub">Poster</span></span></li>
+          <li class="entry"><span class="when">2024</span><span class="what">PNI Annual Retreat<span class="sub">Talk · Best Talk Award</span></span></li>
+          <li class="entry"><span class="when">2022, 2023</span><span class="what">Society for Neuroscience<span class="sub">Poster</span></span></li>
+          <li class="entry"><span class="when">2018</span><span class="what">SACNAS National Conference<span class="sub">Talk / poster</span></span></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Mentoring &amp; service</h3>
+        <ul class="entries">
+          <li class="entry"><span class="when">2022 – now</span><span class="what">Graduate student mentor (2 students)<span class="sub">Photometry hardware, stereotaxic surgery, analysis pipelines</span></span></li>
+          <li class="entry"><span class="when"><span class="todo">[years]</span></span><span class="what">Abstract reviewer, Society for Neuroscience</span></li>
+          <li class="entry"><span class="when"><span class="todo">[years]</span></span><span class="what">PNI Graduate Student Committee</span></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Press</h3>
+        <ul class="entries">
+          <li class="entry"><span class="when">Nov 2026</span><span class="what"><a href="https://www.eurekalert.org/news-releases/1149964" target="_blank" rel="noopener">Princeton University news release</a><span class="sub">“Mice that watch fights come away battle-ready”</span></span></li>
+          <li class="entry"><span class="when">Nov 2026</span><span class="what"><a href="https://nautil.us/what-happened-when-neuroscientists-started-a-mouse-fight-club-1286353" target="_blank" rel="noopener">Nautilus</a><span class="sub">“What happened when neuroscientists started a mouse fight club”</span></span></li>
+          <li class="entry"><span class="when"><span class="todo">[date]</span></span><span class="what"><span class="todo">[additional coverage]</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Jorge Iravedra-García · San Juan → Princeton</span>
+    <ul>
+      <li><a href="mailto:jmig@princeton.edu">Email</a></li>
+      <li><a href="https://scholar.google.com/citations?user=jb-Dg9sAAAAJ&amp;hl=en" target="_blank" rel="noopener">Scholar</a></li>
+      <li><a href="https://github.com/jorgeiravedra" target="_blank" rel="noopener">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/in/jorge-iravedra-garc%C3%ADa-phd-3a0264169/" target="_blank" rel="noopener">LinkedIn</a></li>
+    </ul>
+  </div>
+</footer>
+
+</body>
+</html>
