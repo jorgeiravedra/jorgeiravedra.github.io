@@ -173,7 +173,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .media { position: relative; background: #050d11; border-bottom: 1px solid var(--line); }
 .media video { display: block; width: 100%; height: auto; }
 .media figcaption, .mediafig figcaption { font-size: 0.82rem; color: var(--muted); line-height: 1.45; padding: 0.7rem 0 0; }
-.media-row { padding: 0 clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem); }
+.media-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 2rem); align-items: start; padding: 0 clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem); }
+@media (max-width: 760px) { .media-row { grid-template-columns: 1fr; } }
+.paper { box-shadow: 0 1px 2px rgba(13, 26, 33, 0.06), 0 18px 40px -18px rgba(13, 26, 33, 0.35); background: #fff; }
 .media-row figure, .mediafig { margin: 0; min-width: 0; }
 .media-row video, .zoomable { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-2); }
 .zoomable { cursor: zoom-in; }
@@ -277,7 +279,7 @@ footer a:hover { color: var(--ink); }
       </div>
     </div>
     <div class="portrait-wrap">
-      <img class="portrait" src="headshot.jpeg" alt="Portrait of Jorge Iravedra-García" width="400" height="400">
+      <img class="portrait" src="headshot.jpg" alt="Portrait of Jorge Iravedra-García" width="400" height="400">
     </div>
   </div>
 </header>
@@ -341,8 +343,8 @@ footer a:hover { color: var(--ink); }
             <p class="summary">Social species learn about conflict without taking part in it, but whether watching recruits the same neural machinery as doing was unknown. Over eight days, male mice gained experience either by direct interaction with a weaker opponent, by watching those encounters from behind a barrier, or with a non-social object, while we recorded excitatory and inhibitory populations simultaneously across twelve nodes of the social behavior network. Observers attended selectively to attacks, and during watching their network activity resembled that of experienced animals, with distinct signatures in regions associated with reward and threat learning. Facing an unfamiliar, harder opponent on day nine, observers and experienced animals both responded faster and spent less time disengaged than controls, without becoming more aggressive overall, and their behavioral transition structure converged. Network modeling identified a shared, persistent decoupling of inhibition from a key hypothalamic output region; chemogenetically restoring that inhibition returned behavior toward the naive pattern.</p>
           </div>
           <figure class="mediafig">
-            <img class="zoomable" src="assets/nature-fig1-thumb.png" data-full="assets/nature-fig1.png" alt="Figure 1: targeting twelve sites in the social behavior network, two-color photometry traces, and attack-aligned responses" loading="lazy">
-            <figcaption>Figure 1. Click to enlarge.</figcaption>
+            <img class="zoomable paper" src="assets/nature-firstpage.png" alt="Opening page of the article as published in Nature" loading="lazy">
+            <figcaption>As published, 4 November 2026. Click to enlarge.</figcaption>
           </figure>
         </div>
         <div class="card-links">
@@ -358,6 +360,10 @@ footer a:hover { color: var(--ink); }
         <figure class="vidwrap">
           <video src="assets/nature-recording.mp4" poster="assets/poster-recording.jpg" autoplay muted loop playsinline preload="none" aria-label="Simultaneous photometry traces from ten regions during free social behavior"></video>
           <figcaption>Twelve-site photometry streaming during free behavior. Red and blue traces are the inhibitory and excitatory populations at each site; green is dopamine release in NAc.</figcaption>
+        </figure>
+        <figure>
+          <img class="zoomable" src="assets/nature-fig1-thumb.png" data-full="assets/nature-fig1.png" alt="Figure 2: targeting twelve sites in the social behavior network, two-color photometry traces, and attack-aligned responses" loading="lazy">
+          <figcaption>Figure 2. Targeting the network, the recording configuration, and attack-aligned responses across sites. Click to enlarge.</figcaption>
         </figure>
       </div>
     </article>
