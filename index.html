@@ -19,11 +19,13 @@
    Palette: flamboyán (coral-red) and Caribbean turquoise on clean white; tropical-night ocean navy in dark mode. */
 :root {
   --bg: #ffffff;
-  --bg-2: #f2f7f7;
+  --bg-2: #eef4fa;
+  --wash-1: #ffffff;
+  --wash-2: #dceaf5;
   --card: #ffffff;
   --ink: #0d1a21;
   --muted: #5b6c74;
-  --line: #e1e9eb;
+  --line: #e0e8ee;
   --link: #087f80;
   --flamboyan: #e5482f;
   --mango: #f2a93b;
@@ -41,7 +43,8 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #07141b; --bg-2: #0c1e27; --card: #0f2530; --ink: #edf4f5; --muted: #93a8b0; --line: #1b3340;
+    --bg: #07141b; --bg-2: #0c1e27; --wash-1: #07141b; --wash-2: #0d2733; --card: #0f2530;
+    --ink: #edf4f5; --muted: #93a8b0; --line: #1b3340;
     --link: #45d1c8; --flamboyan: #ff6a4d; --mango: #ffc25a; --turquoise: #45d1c8;
     --btn-bg: #edf4f5; --btn-ink: #07141b; --nav-bg: rgba(7, 20, 27, 0.7);
     --todo-bg: #3b2a10; --todo-ink: #ffd18a;
@@ -50,7 +53,8 @@
   }
 }
 :root[data-theme="dark"] {
-  --bg: #07141b; --bg-2: #0c1e27; --card: #0f2530; --ink: #edf4f5; --muted: #93a8b0; --line: #1b3340;
+  --bg: #07141b; --bg-2: #0c1e27; --wash-1: #07141b; --wash-2: #0d2733; --card: #0f2530;
+  --ink: #edf4f5; --muted: #93a8b0; --line: #1b3340;
   --link: #45d1c8; --flamboyan: #ff6a4d; --mango: #ffc25a; --turquoise: #45d1c8;
   --btn-bg: #edf4f5; --btn-ink: #07141b; --nav-bg: rgba(7, 20, 27, 0.7);
   --todo-bg: #3b2a10; --todo-ink: #ffd18a;
@@ -63,10 +67,15 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body {
   margin: 0;
-  background: var(--bg); color: var(--ink);
+  background-color: var(--bg); color: var(--ink);
+  background-image: linear-gradient(172deg, var(--wash-1) 0%, var(--wash-2) 38%, var(--wash-1) 62%, var(--wash-2) 100%);
+  background-attachment: fixed; background-size: 100% 260%; background-position: 50% 0%;
+  animation: tide 24s ease-in-out infinite alternate;
   font-family: var(--f-sans); font-size: 1.0625rem; line-height: 1.6;
   -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
 }
+@keyframes tide { from { background-position: 50% 0%; } to { background-position: 50% 100%; } }
+@media (prefers-reduced-motion: reduce) { body { animation: none; background-position: 50% 35%; } }
 a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
 a:focus-visible, .btn:focus-visible { outline: 2px solid var(--turquoise); outline-offset: 3px; border-radius: 8px; }
@@ -127,7 +136,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 }
 
 /* ---------- Figures strip ---------- */
-.band { background: var(--bg-2); border-block: 1px solid var(--line); }
+.band { background: color-mix(in srgb, var(--bg-2) 70%, transparent); border-block: 1px solid var(--line); }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; padding-block: clamp(2.5rem, 5vw, 3.5rem); }
 .stat { padding: 0.25rem 0; }
 .stat .num { font-size: clamp(2.4rem, 1.6rem + 3vw, 3.75rem); font-weight: 600; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -162,8 +171,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .media { position: relative; background: #050d11; border-bottom: 1px solid var(--line); }
 .media video { display: block; width: 100%; height: auto; }
 .media figcaption, .mediafig figcaption { font-size: 0.82rem; color: var(--muted); line-height: 1.45; padding: 0.7rem 0 0; }
-.media-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 2rem); padding: 0 clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem); }
-@media (max-width: 760px) { .media-row { grid-template-columns: 1fr; } }
+.media-row { padding: 0 clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem); }
 .media-row figure, .mediafig { margin: 0; min-width: 0; }
 .media-row video, .zoomable { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-2); }
 .zoomable { cursor: zoom-in; }
@@ -316,16 +324,12 @@ footer a:hover { color: var(--ink); }
           <video src="assets/nature-recording.mp4" poster="assets/poster-recording.jpg" autoplay muted loop playsinline preload="none" aria-label="Simultaneous photometry traces from ten regions during free social behavior"></video>
           <figcaption>Twelve-site photometry streaming during free behavior. Red and blue traces are the inhibitory and excitatory populations at each site; green is dopamine release in NAc.</figcaption>
         </figure>
-        <figure>
-          <img class="zoomable" src="assets/poster-training.jpg" alt="The three training conditions side by side" loading="lazy">
-          <figcaption>The three training conditions. Observers (centre) see, hear and smell the encounter from a raised platform behind a clear barrier, with a dedicated camera on the observer.</figcaption>
-        </figure>
       </div>
     </article>
 
     <div class="grid">
       <article class="card">
-        <div class="figslot">[Figure, assets/jove2026.png]</div>
+        <img class="thumb zoomable" src="assets/jove-fig.png" alt="Multifiber implant fabrication, surgical implantation, the imaging path, and isosbestic motion-artifact correction" loading="lazy">
         <div class="body">
           <span class="tag">JoVE · 2026 · Methods</span>
           <h3><a href="https://doi.org/10.3791/70049" target="_blank" rel="noopener">Two-color multifiber photometry recordings of the social behavior network in mice</a></h3>
@@ -377,7 +381,7 @@ footer a:hover { color: var(--ink); }
       <div class="panel">
         <h3>Education</h3>
         <ul class="entries">
-          <li class="entry"><span class="when"><span class="todo">[start]</span> – 2026</span><span class="what"><strong>Ph.D., Neuroscience</strong>, Princeton University<span class="sub">Dissertation: <i>Brain-wide neural mechanisms underlying the observational learning of aggression</i>. Advisor: Annegret Falkner</span></span></li>
+          <li class="entry"><span class="when">2019 – 2026</span><span class="what"><strong>Ph.D., Neuroscience</strong>, Princeton University<span class="sub">Dissertation: <i>Brain-wide neural mechanisms underlying the observational learning of aggression</i>. Advisor: Annegret Falkner</span></span></li>
           <li class="entry"><span class="when">2022</span><span class="what"><strong>M.A., Neuroscience</strong>, Princeton University</span></li>
           <li class="entry"><span class="when">2015 – 2019</span><span class="what"><strong>B.S., Molecular and Cellular Biology</strong><span class="sub">University of Puerto Rico, Río Piedras</span></span></li>
         </ul>
