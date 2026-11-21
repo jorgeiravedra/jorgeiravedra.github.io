@@ -183,10 +183,14 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .vidwrap .cap { position: absolute; top: 0.6rem; left: 0.6rem; font-family: var(--f-mono); font-size: 0.65rem; letter-spacing: 0.05em; text-transform: uppercase; color: #fff; background: rgba(5, 13, 17, 0.6); backdrop-filter: blur(6px); padding: 0.25rem 0.55rem; border-radius: 999px; pointer-events: none; }
 .card .thumb { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: center top; border-bottom: 1px solid var(--line); background: var(--bg-2); cursor: zoom-in; }
 
-/* Photometry strip */
-.strip { position: relative; border-top: 1px solid var(--line); background: var(--bg); }
-.strip canvas { display: block; width: 100%; height: clamp(132px, 19vh, 196px); }
-.strip .label { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 0.5rem; font-family: var(--f-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); opacity: 0.75; pointer-events: none; }
+/* Simulation panels */
+.duo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; align-items: stretch; }
+@media (max-width: 820px) { .duo { grid-template-columns: 1fr; } }
+.simpanel { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.simpanel canvas { display: block; width: 100%; height: clamp(230px, 30vh, 320px); }
+.simpanel figcaption { border-top: 1px solid var(--line); padding: 0.85rem clamp(1rem, 2.5vw, 1.4rem); font-size: 0.84rem; color: var(--muted); line-height: 1.45; }
+.simpanel figcaption b { display: block; color: var(--ink); font-weight: 600; font-size: 0.92rem; margin-bottom: 0.15rem; }
+.simnote { font-family: var(--f-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 1rem 0 0; text-align: right; }
 
 /* Audio player */
 .listen { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
@@ -289,9 +293,20 @@ footer a:hover { color: var(--ink); }
   </div>
 </header>
 
-<section class="strip" aria-hidden="true">
-  <canvas id="traces"></canvas>
-  <span class="label">Simulated network activity</span>
+<section class="section" id="sim" aria-label="Simulated behavior and network activity">
+  <div class="wrap">
+    <div class="duo">
+      <figure class="simpanel">
+        <canvas id="arena" aria-hidden="true"></canvas>
+        <figcaption><b>Pose</b>Twelve tracked keypoints per animal, cycling through avoidance, investigation and aggression. The bar beneath is the running ethogram.</figcaption>
+      </figure>
+      <figure class="simpanel">
+        <canvas id="traces" aria-hidden="true"></canvas>
+        <figcaption><b>Network</b>Twelve recording sites. Events recruit much of the network at once, as attack-aligned responses do, with onset and amplitude varying by site.</figcaption>
+      </figure>
+    </div>
+    <p class="simnote">Simulated · not recorded data</p>
+  </div>
 </section>
 
 <section class="band" aria-label="Recording platform at a glance">
@@ -582,93 +597,291 @@ footer a:hover { color: var(--ink); }
 })();
 
 (function () {
-  var cv = document.getElementById("traces");
-  if (!cv || !cv.getContext) return;
-  var ctx = cv.getContext("2d"), css = getComputedStyle(document.documentElement);
-  var N = 12, PX = 2.2;            // channels, horizontal pixels per sample
-  var FS = 60;                     // samples per second
-  var buf = [], chan = [], W = 0, H = 0, len = 0, raf = null, live = true;
+  var arena = document.getElementById("arena"), scope = document.getElementById("traces");
+  if (!arena || !scope || !arena.getContext) return;
+  var ac = arena.getContext("2d"), sc = scope.getContext("2d");
+  var css = getComputedStyle(document.documentElement);
+  var FS = 50, DT = 1 / FS, PX = 2.0, N = 12;   // sim rate, seconds per step, px per sample, sites
 
   function rnd(a, b) { return a + Math.random() * (b - a); }
+  function wrapAng(a) { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; }
 
-  // One channel = events convolved with a calcium kernel, over slow correlated noise.
-  function makeChannels() {
-    chan = [];
+  /* ---------- behaviour ---------- */
+  // One state machine drives both panels: avoid → investigate → aggress → repeat.
+  var beh = {
+    state: "avoid", left: 7, t: 0, lunge: 0, contact: 0,
+    hist: [],                                    // recent states, for the ethogram
+    next: function () {
+      if (this.state === "avoid") { this.state = "investigate"; this.left = rnd(7, 11); }
+      else if (this.state === "investigate") { this.state = "aggress"; this.left = rnd(5, 8); }
+      else { this.state = "avoid"; this.left = rnd(6, 10); }
+    }
+  };
+
+  var A = { x: 0, y: 0, vx: 0, vy: 0, th: 0, gait: 0, tail: [], role: "resident" };
+  var B = { x: 0, y: 0, vx: 0, vy: 0, th: Math.PI, gait: 0, tail: [], role: "intruder" };
+
+  /* ---------- network sites ---------- */
+  var site = [], queue = [];                     // queue: scheduled {t, ch, amp}
+  for (var i = 0; i < N; i++) {
+    site.push({
+      kind: i === N - 1 ? 2 : (i % 2),            // 0 excitatory, 1 inhibitory, 2 dopamine
+      rise: Math.exp(-DT / rnd(0.08, 0.14)),
+      decay: Math.exp(-DT / (i === N - 1 ? rnd(0.45, 0.8) : rnd(0.7, 1.6))),
+      gain: rnd(0.65, 1.1), lone: rnd(0.03, 0.08) * DT,
+      s: 0, f: 0, n: 0
+    });
+  }
+  var buf = [], clock = 0;
+
+  // A network event recruits most sites, each with its own delay and amplitude.
+  function fire(strength) {
     for (var i = 0; i < N; i++) {
-      var kind = i === N - 1 ? 2 : (i % 2);          // 0 excitatory, 1 inhibitory, 2 dopamine
-      chan.push({
-        kind: kind,
-        rate: rnd(0.35, 1.1) / FS,                   // events per sample
-        rise: Math.exp(-1 / (FS * rnd(0.05, 0.09))), // fast onset
-        decay: Math.exp(-1 / (FS * (kind === 2 ? rnd(0.25, 0.45) : rnd(0.45, 1.3)))),
-        gain: rnd(0.55, 1),
-        f: 0, s: 0, base: 0, noise: 0
-      });
+      if (Math.random() > rnd(0.62, 0.95)) continue;
+      queue.push({ t: clock + rnd(0, 0.34), ch: i, amp: strength * rnd(0.55, 1.45) * site[i].gain });
     }
   }
-  function step() {
-    // A shared network drive makes channels co-activate, as real ones do.
-    var shared = Math.random() < 0.55 / FS ? rnd(0.5, 1.1) : 0;
-    var col = [];
-    for (var i = 0; i < N; i++) {
-      var c = chan[i];
-      var ev = (Math.random() < c.rate ? rnd(0.8, 2.2) : 0) + shared * rnd(0.4, 1.2);
-      c.s = c.s * c.decay + ev;                      // event train with decay
-      c.f = c.f * c.rise + c.s * (1 - c.rise);       // smoothed rise
-      c.base = c.base * 0.9995 + c.f * 0.0005;      // slow baseline, as airPLS would remove
-      c.noise = c.noise * 0.9 + (Math.random() - 0.5) * 0.08;
-      col.push((c.f - c.base) * c.gain + c.noise);
-    }
-    buf.push(col);
-    while (buf.length > len) buf.shift();
-  }
-  function size() {
-    var r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+
+  /* ---------- geometry ---------- */
+  var W = 0, H = 0, EB = 16, L = 40;             // canvas size, ethogram band, body length
+  function arenaSize() {
+    var r = arena.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
     if (!r.width || !r.height) return false;
     W = r.width; H = r.height;
-    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    len = Math.ceil(W / PX) + 2;
-    while (buf.length > len) buf.shift();
+    arena.width = Math.round(W * dpr); arena.height = Math.round(H * dpr);
+    ac.setTransform(dpr, 0, 0, dpr, 0, 0);
+    L = Math.max(34, Math.min(W * 0.26, (H - EB) * 0.32));
     return true;
   }
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
+  var SW = 0, SH = 0, SLEN = 0;
+  function scopeSize() {
+    var r = scope.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    if (!r.width || !r.height) return false;
+    SW = r.width; SH = r.height;
+    scope.width = Math.round(SW * dpr); scope.height = Math.round(SH * dpr);
+    sc.setTransform(dpr, 0, 0, dpr, 0, 0);
+    SLEN = Math.ceil(SW / PX) + 2;
+    while (buf.length > SLEN) buf.shift();
+    return true;
+  }
+
+  function place() {
+    var m = L * 1.6, fh = H - EB;
+    A.x = m + L; A.y = fh * 0.5; B.x = W - m - L; B.y = fh * 0.5;
+    A.tail = []; B.tail = [];
+    for (var i = 0; i < 3; i++) { A.tail.push({ x: A.x, y: A.y }); B.tail.push({ x: B.x, y: B.y }); }
+  }
+
+  function steer(m, tx, ty, speed, grip) {
+    var dx = tx - m.x, dy = ty - m.y, d = Math.hypot(dx, dy) || 1;
+    m.vx += ((dx / d) * speed - m.vx) * grip;
+    m.vy += ((dy / d) * speed - m.vy) * grip;
+    m.x += m.vx * DT; m.y += m.vy * DT;
+    var pad = L * 0.8, fh = H - EB;
+    if (m.x < pad) { m.x = pad; m.vx = Math.abs(m.vx) * 0.4; }
+    if (m.x > W - pad) { m.x = W - pad; m.vx = -Math.abs(m.vx) * 0.4; }
+    if (m.y < pad) { m.y = pad; m.vy = Math.abs(m.vy) * 0.4; }
+    if (m.y > fh - pad) { m.y = fh - pad; m.vy = -Math.abs(m.vy) * 0.4; }
+    var sp = Math.hypot(m.vx, m.vy);
+    if (sp > 3) m.th += wrapAng(Math.atan2(m.vy, m.vx) - m.th) * 0.16;
+    m.gait += sp * DT * 0.09;
+    // tail follows the body with lag
+    var px = m.x - Math.cos(m.th) * L * 0.34, py = m.y - Math.sin(m.th) * L * 0.34;
+    for (var i = 0; i < m.tail.length; i++) {
+      var t = m.tail[i], ddx = px - t.x, ddy = py - t.y, dd = Math.hypot(ddx, ddy) || 1, seg = L * 0.26;
+      if (dd > seg) { t.x += ddx / dd * (dd - seg) * 0.55; t.y += ddy / dd * (dd - seg) * 0.55; }
+      px = t.x; py = t.y;
+    }
+    return sp;
+  }
+
+  // keep the two bodies from interpenetrating
+  function separate() {
+    var dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || 1, min = L * 0.82;
+    if (d >= min) return;
+    var push = (min - d) / 2, ux = dx / d, uy = dy / d;
+    A.x -= ux * push; A.y -= uy * push;
+    B.x += ux * push; B.y += uy * push;
+  }
+
+  var wobble = 0;
+  function stepBehaviour() {
+    beh.t += DT; beh.left -= DT; wobble += DT;
+    var fh = H - EB, cx = W / 2, cy = fh / 2;
+
+    if (beh.state === "avoid") {
+      steer(A, L * 2 + Math.sin(wobble * 0.5) * L, cy + Math.cos(wobble * 0.37) * fh * 0.3, rnd(18, 26), 0.03);
+      steer(B, W - L * 2 + Math.sin(wobble * 0.43 + 2) * L, cy + Math.sin(wobble * 0.31) * fh * 0.3, rnd(16, 24), 0.03);
+      if (Math.random() < 0.12 * DT) fire(rnd(0.3, 0.6));
+
+    } else if (beh.state === "investigate") {
+      // the resident follows the intruder's rear; the intruder drifts away
+      var tx = B.x - Math.cos(B.th) * L * 0.95, ty = B.y - Math.sin(B.th) * L * 0.95;
+      var sp = steer(A, tx, ty, 46, 0.05);
+      steer(B, cx + Math.cos(wobble * 0.3) * W * 0.3, cy + Math.sin(wobble * 0.46) * fh * 0.32, 26, 0.03);
+      var gap = Math.hypot(A.x - B.x, A.y - B.y);
+      beh.contact -= DT;
+      if (gap < L * 1.6 && beh.contact <= 0) { fire(rnd(0.9, 1.5)); beh.contact = rnd(1.3, 2.4); }
+
+    } else {
+      beh.lunge -= DT;
+      if (beh.lunge <= 0) {                       // discrete attack bouts
+        beh.lunge = rnd(0.9, 1.7);
+        fire(rnd(2.4, 3.6));
+        beh.burst = 0.45;
+      }
+      beh.burst = Math.max(0, (beh.burst || 0) - DT);
+      var fast = beh.burst > 0;
+      var ux = (B.x - A.x), uy = (B.y - A.y), ud = Math.hypot(ux, uy) || 1;
+      steer(A, B.x - ux / ud * L * 0.8, B.y - uy / ud * L * 0.8, fast ? 122 : 32, fast ? 0.13 : 0.05);
+      var away = Math.atan2(B.y - A.y, B.x - A.x);
+      steer(B, B.x + Math.cos(away) * L * 3, B.y + Math.sin(away) * L * 3, fast ? 108 : 30, 0.09);
+    }
+
+    separate();
+    if (Math.random() < 0.015 * DT) fire(rnd(0.35, 0.7));
+    if (beh.left <= 0) beh.next();
+    beh.hist.push(beh.state);
+    while (beh.hist.length > 900) beh.hist.shift();
+  }
+
+  function stepNetwork() {
+    clock += DT;
+    for (var q = queue.length - 1; q >= 0; q--) {
+      if (queue[q].t <= clock) { site[queue[q].ch].s += queue[q].amp; queue.splice(q, 1); }
+    }
+    var col = [];
+    for (var i = 0; i < N; i++) {
+      var c = site[i];
+      if (Math.random() < c.lone) c.s += rnd(0.35, 0.8) * c.gain;
+      c.s *= c.decay;
+      c.f += (c.s - c.f) * (1 - c.rise);
+      c.n = c.n * 0.86 + (Math.random() - 0.5) * 0.035;
+      col.push(c.f + c.n);
+    }
+    buf.push(col);
+    while (buf.length > SLEN) buf.shift();
+  }
+
+  /* ---------- drawing ---------- */
+  // 0 nose · 1 head · 2 L ear · 3 R ear · 4 L forepaw · 5 R forepaw
+  // 6 L hindpaw · 7 R hindpaw · 8 tail base · 9 tail 1 · 10 tail 2 · 11 tail tip
+  var SKEL = [[0, 1], [1, 2], [1, 3], [1, 8], [1, 4], [1, 5], [8, 6], [8, 7], [8, 9], [9, 10], [10, 11]];
+
+  function pts(m) {
+    var c = Math.cos(m.th), s = Math.sin(m.th), nx = -s, ny = c;
+    var g = Math.sin(m.gait) * L * 0.12, g2 = Math.sin(m.gait + Math.PI) * L * 0.12;
+    function P(f, l, push) {
+      push = push || 0;
+      return { x: m.x + c * (L * f + push) + nx * L * l, y: m.y + s * (L * f + push) + ny * L * l };
+    }
+    return [
+      P(0.6, 0), P(0.34, 0),                      // nose, head
+      P(0.26, -0.16), P(0.26, 0.16),              // ears
+      P(0.12, -0.2, g), P(0.12, 0.2, g2),         // forepaws, alternating
+      P(-0.18, -0.22, g2), P(-0.18, 0.22, g),     // hindpaws, counterphase
+      P(-0.34, 0),                                // tail base
+      m.tail[0], m.tail[1], m.tail[2]             // tail 1, 2, tip
+    ];
+  }
+
+  function drawMouse(m, color) {
+    var p = pts(m);
+    ac.strokeStyle = color; ac.lineWidth = 1.8; ac.lineCap = "round"; ac.globalAlpha = 0.45;
+    ac.beginPath();
+    for (var e = 0; e < SKEL.length; e++) {
+      ac.moveTo(p[SKEL[e][0]].x, p[SKEL[e][0]].y);
+      ac.lineTo(p[SKEL[e][1]].x, p[SKEL[e][1]].y);
+    }
+    ac.stroke();
+    ac.globalAlpha = 1; ac.fillStyle = color;
+    for (var i = 0; i < p.length; i++) {
+      var r = i === 0 ? 3.4 : (i === 1 || i === 8 ? 2.9 : 2.3);
+      ac.beginPath(); ac.arc(p[i].x, p[i].y, r, 0, 6.2832); ac.fill();
+    }
+  }
+
+  var LABEL = { avoid: "Avoidance", investigate: "Investigation", aggress: "Aggression" };
+  function stateColor(st) {
+    if (st === "aggress") return css.getPropertyValue("--flamboyan").trim() || "#e8112d";
+    if (st === "investigate") return css.getPropertyValue("--mango").trim() || "#f0a21f";
+    return css.getPropertyValue("--muted").trim() || "#5f666d";
+  }
+
+  function drawArena() {
+    var fh = H - EB;
+    ac.clearRect(0, 0, W, H);
+    drawMouse(A, css.getPropertyValue("--flamboyan").trim() || "#e8112d");
+    drawMouse(B, css.getPropertyValue("--turquoise").trim() || "#0b4fa0");
+
+    // state chip
+    var c = stateColor(beh.state);
+    ac.font = '600 11px ui-monospace, "Geist Mono", Menlo, monospace';
+    var txt = LABEL[beh.state].toUpperCase(), w = ac.measureText(txt).width;
+    ac.globalAlpha = 0.12; ac.fillStyle = c;
+    ac.beginPath();
+    if (ac.roundRect) { ac.roundRect(12, 12, w + 20, 22, 11); ac.fill(); } else ac.fillRect(12, 12, w + 20, 22);
+    ac.globalAlpha = 1; ac.fillStyle = c; ac.fillText(txt, 22, 27);
+
+    // ethogram: one pixel column per sample, most recent at the right
+    var y = H - EB + 5, hgt = 7, n = Math.min(beh.hist.length, Math.floor(W));
+    for (var i = 0; i < n; i++) {
+      ac.fillStyle = stateColor(beh.hist[beh.hist.length - n + i]);
+      ac.globalAlpha = 0.85;
+      ac.fillRect(W - n + i, y, 1.2, hgt);
+    }
+    ac.globalAlpha = 1;
+  }
+
+  function drawScope() {
+    sc.clearRect(0, 0, SW, SH);
     var exc = css.getPropertyValue("--turquoise").trim() || "#0b4fa0";
     var inh = css.getPropertyValue("--flamboyan").trim() || "#e8112d";
     var da = css.getPropertyValue("--mango").trim() || "#f0a21f";
-    var pad = 10, lane = (H - pad * 2) / N, amp = lane * 0.65;
-    ctx.lineWidth = 1.2; ctx.lineJoin = "round"; ctx.globalAlpha = 0.9;
+    var pad = 13, lane = (SH - pad * 2) / N, amp = lane * 0.5;
+    sc.lineWidth = 1.25; sc.lineJoin = "round"; sc.globalAlpha = 0.92;
     for (var i = 0; i < N; i++) {
-      var base = pad + lane * (i + 0.8);
-      ctx.strokeStyle = chan[i].kind === 2 ? da : (chan[i].kind ? inh : exc);
-      ctx.beginPath();
+      var base = pad + lane * (i + 0.86);
+      sc.strokeStyle = site[i].kind === 2 ? da : (site[i].kind ? inh : exc);
+      sc.beginPath();
       for (var j = 0; j < buf.length; j++) {
-        var x = W - (buf.length - 1 - j) * PX, y = base - Math.min(buf[j][i], 4) * amp;
-        j ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+        var x = SW - (buf.length - 1 - j) * PX;
+        var y = base - Math.min(buf[j][i], 3.2) * amp;
+        j ? sc.lineTo(x, y) : sc.moveTo(x, y);
       }
-      ctx.stroke();
+      sc.stroke();
     }
-    ctx.globalAlpha = 1;
+    sc.globalAlpha = 1;
   }
-  function loop() { step(); draw(); raf = requestAnimationFrame(loop); }
-  function start() { if (!raf && live) raf = requestAnimationFrame(loop); }
+
+  /* ---------- loop: fixed timestep, decoupled from the frame rate ---------- */
+  var last = 0, acc = 0, raf = null, visible = true;
+  function frame(now) {
+    raf = requestAnimationFrame(frame);
+    if (!last) last = now;
+    acc += Math.min((now - last) / 1000, 0.25);   // cap catch-up after a stall
+    last = now;
+    var guard = 0;
+    while (acc >= DT && guard++ < 12) { stepBehaviour(); stepNetwork(); acc -= DT; }
+    drawArena(); drawScope();
+  }
+  function start() { if (!raf && visible) { last = 0; raf = requestAnimationFrame(frame); } }
   function stop() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
 
-  makeChannels();
-  if (!size()) return;
-  for (var k = 0; k < len; k++) step();              // fill the canvas before the first frame
-  draw();
+  if (!arenaSize() || !scopeSize()) return;
+  place();
+  for (var w = 0; w < SLEN + FS * 6; w++) { stepBehaviour(); stepNetwork(); }   // warm start
+  drawArena(); drawScope();
 
-  var calm = window.matchMedia("(prefers-reduced-motion: reduce)");
-  if (calm.matches) return;                          // leave the still frame in place
-  if (window.ResizeObserver) new ResizeObserver(function () { if (size()) draw(); }).observe(cv);
-  else window.addEventListener("resize", function () { if (size()) draw(); });
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  function onResize() { if (arenaSize()) place(); scopeSize(); drawArena(); drawScope(); }
+  if (window.ResizeObserver) new ResizeObserver(onResize).observe(arena.parentNode);
+  else window.addEventListener("resize", onResize);
   document.addEventListener("visibilitychange", function () { document.hidden ? stop() : start(); });
   if (window.IntersectionObserver) {
-    new IntersectionObserver(function (es) { live = es[0].isIntersecting; live ? start() : stop(); },
-      { threshold: 0 }).observe(cv);
-  } else start();
+    new IntersectionObserver(function (e) { visible = e[0].isIntersecting; visible ? start() : stop(); },
+      { threshold: 0 }).observe(arena);
+  }
   start();
 })();
 </script>
