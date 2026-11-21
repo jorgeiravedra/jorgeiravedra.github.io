@@ -174,14 +174,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 @media (max-width: 860px) { .featured .lead-in { grid-template-columns: 1fr; } }
 
 /* Media */
+.mediafig { margin: 0; min-width: 0; }
+.zoomable { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-2); }
+.media figcaption, .mediafig figcaption { font-size: 0.82rem; color: var(--muted); line-height: 1.45; padding: 0.7rem 0 0; }
 .media { position: relative; background: #050d11; border-bottom: 1px solid var(--line); }
 .media video { display: block; width: 100%; height: auto; }
-.media figcaption, .mediafig figcaption { font-size: 0.82rem; color: var(--muted); line-height: 1.45; padding: 0.7rem 0 0; }
-.media-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 2rem); align-items: start; padding: 0 clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem); }
-@media (max-width: 760px) { .media-row { grid-template-columns: 1fr; } }
 .paper { box-shadow: 0 1px 2px rgba(13, 26, 33, 0.06), 0 18px 40px -18px rgba(13, 26, 33, 0.35); background: #fff; }
-.media-row figure, .mediafig { margin: 0; min-width: 0; }
-.media-row video, .zoomable { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-2); }
 .zoomable { cursor: zoom-in; }
 .vidwrap { position: relative; }
 .vidwrap .cap { position: absolute; top: 0.6rem; left: 0.6rem; font-family: var(--f-mono); font-size: 0.65rem; letter-spacing: 0.05em; text-transform: uppercase; color: #fff; background: rgba(5, 13, 17, 0.6); backdrop-filter: blur(6px); padding: 0.25rem 0.55rem; border-radius: 999px; pointer-events: none; }
@@ -367,16 +365,6 @@ footer a:hover { color: var(--ink); }
           <a href="https://arstechnica.com/science/2026/11/watching-mouse-fight-club-teaches-the-critters-how-to-fight/" target="_blank" rel="noopener">Ars Technica</a>
           <a href="#listen">NPR segment</a>
         </div>
-      </div>
-      <div class="media-row">
-        <figure class="vidwrap">
-          <video data-src="assets/nature-recording.mp4" poster="assets/poster-recording.jpg" muted loop playsinline preload="none" aria-label="Simultaneous photometry traces from ten regions during free social behavior"></video>
-          <figcaption>Twelve-site photometry streaming during free behavior. Red and blue traces are the inhibitory and excitatory populations at each site; green is dopamine release in NAc.</figcaption>
-        </figure>
-        <figure>
-          <img class="zoomable" src="assets/nature-fig1-thumb.jpg" data-full="assets/nature-fig1.png" alt="Figure 2: targeting twelve sites in the social behavior network, two-color photometry traces, and attack-aligned responses" loading="lazy">
-          <figcaption>Figure 2. Targeting the network, the recording configuration, and attack-aligned responses across sites. Click to enlarge.</figcaption>
-        </figure>
       </div>
     </article>
 
