@@ -183,6 +183,11 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .vidwrap .cap { position: absolute; top: 0.6rem; left: 0.6rem; font-family: var(--f-mono); font-size: 0.65rem; letter-spacing: 0.05em; text-transform: uppercase; color: #fff; background: rgba(5, 13, 17, 0.6); backdrop-filter: blur(6px); padding: 0.25rem 0.55rem; border-radius: 999px; pointer-events: none; }
 .card .thumb { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: center top; border-bottom: 1px solid var(--line); background: var(--bg-2); cursor: zoom-in; }
 
+/* Photometry strip */
+.strip { position: relative; border-top: 1px solid var(--line); background: var(--bg); }
+.strip canvas { display: block; width: 100%; height: clamp(132px, 19vh, 196px); }
+.strip .label { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 0.5rem; font-family: var(--f-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); opacity: 0.75; pointer-events: none; }
+
 /* Audio player */
 .listen { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
 @media (max-width: 860px) { .listen { grid-template-columns: 1fr; } }
@@ -283,6 +288,11 @@ footer a:hover { color: var(--ink); }
     </div>
   </div>
 </header>
+
+<section class="strip" aria-hidden="true">
+  <canvas id="traces"></canvas>
+  <span class="label">Simulated network activity</span>
+</section>
 
 <section class="band" aria-label="Recording platform at a glance">
   <div class="wrap stats">
@@ -569,6 +579,97 @@ footer a:hover { color: var(--ink); }
   if (window.ResizeObserver) new ResizeObserver(draw).observe(cv);
   else window.addEventListener("resize", draw);
   tick();
+})();
+
+(function () {
+  var cv = document.getElementById("traces");
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext("2d"), css = getComputedStyle(document.documentElement);
+  var N = 12, PX = 2.2;            // channels, horizontal pixels per sample
+  var FS = 60;                     // samples per second
+  var buf = [], chan = [], W = 0, H = 0, len = 0, raf = null, live = true;
+
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+
+  // One channel = events convolved with a calcium kernel, over slow correlated noise.
+  function makeChannels() {
+    chan = [];
+    for (var i = 0; i < N; i++) {
+      var kind = i === N - 1 ? 2 : (i % 2);          // 0 excitatory, 1 inhibitory, 2 dopamine
+      chan.push({
+        kind: kind,
+        rate: rnd(0.35, 1.1) / FS,                   // events per sample
+        rise: Math.exp(-1 / (FS * rnd(0.05, 0.09))), // fast onset
+        decay: Math.exp(-1 / (FS * (kind === 2 ? rnd(0.25, 0.45) : rnd(0.45, 1.3)))),
+        gain: rnd(0.55, 1),
+        f: 0, s: 0, base: 0, noise: 0
+      });
+    }
+  }
+  function step() {
+    // A shared network drive makes channels co-activate, as real ones do.
+    var shared = Math.random() < 0.55 / FS ? rnd(0.5, 1.1) : 0;
+    var col = [];
+    for (var i = 0; i < N; i++) {
+      var c = chan[i];
+      var ev = (Math.random() < c.rate ? rnd(0.8, 2.2) : 0) + shared * rnd(0.4, 1.2);
+      c.s = c.s * c.decay + ev;                      // event train with decay
+      c.f = c.f * c.rise + c.s * (1 - c.rise);       // smoothed rise
+      c.base = c.base * 0.9995 + c.f * 0.0005;      // slow baseline, as airPLS would remove
+      c.noise = c.noise * 0.9 + (Math.random() - 0.5) * 0.08;
+      col.push((c.f - c.base) * c.gain + c.noise);
+    }
+    buf.push(col);
+    while (buf.length > len) buf.shift();
+  }
+  function size() {
+    var r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    if (!r.width || !r.height) return false;
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    len = Math.ceil(W / PX) + 2;
+    while (buf.length > len) buf.shift();
+    return true;
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    var exc = css.getPropertyValue("--turquoise").trim() || "#0b4fa0";
+    var inh = css.getPropertyValue("--flamboyan").trim() || "#e8112d";
+    var da = css.getPropertyValue("--mango").trim() || "#f0a21f";
+    var pad = 10, lane = (H - pad * 2) / N, amp = lane * 0.65;
+    ctx.lineWidth = 1.2; ctx.lineJoin = "round"; ctx.globalAlpha = 0.9;
+    for (var i = 0; i < N; i++) {
+      var base = pad + lane * (i + 0.8);
+      ctx.strokeStyle = chan[i].kind === 2 ? da : (chan[i].kind ? inh : exc);
+      ctx.beginPath();
+      for (var j = 0; j < buf.length; j++) {
+        var x = W - (buf.length - 1 - j) * PX, y = base - Math.min(buf[j][i], 4) * amp;
+        j ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+  function loop() { step(); draw(); raf = requestAnimationFrame(loop); }
+  function start() { if (!raf && live) raf = requestAnimationFrame(loop); }
+  function stop() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+
+  makeChannels();
+  if (!size()) return;
+  for (var k = 0; k < len; k++) step();              // fill the canvas before the first frame
+  draw();
+
+  var calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (calm.matches) return;                          // leave the still frame in place
+  if (window.ResizeObserver) new ResizeObserver(function () { if (size()) draw(); }).observe(cv);
+  else window.addEventListener("resize", function () { if (size()) draw(); });
+  document.addEventListener("visibilitychange", function () { document.hidden ? stop() : start(); });
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(function (es) { live = es[0].isIntersecting; live ? start() : stop(); },
+      { threshold: 0 }).observe(cv);
+  } else start();
+  start();
 })();
 </script>
 
