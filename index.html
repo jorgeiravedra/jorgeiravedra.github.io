@@ -839,15 +839,22 @@ void main(){vec3 N=normalize(vn);vec3 V=normalize(-ve);float f=1.0-abs(dot(N,V))
 float lam=0.35+0.65*max(dot(N,normalize(vec3(0.4,0.7,0.8))),0.0);\
 o=vec4(c*(0.55+0.45*lam),a*(0.14+0.86*pow(f,2.4)));}");
 
+  // Light cone from a fiber tip: additive, fading with distance.
+  var coneP = prog(
+    "#version 300 es\nin vec3 p;in float t;uniform mat4 mvp;out float vt;\
+void main(){vt=t;gl_Position=mvp*vec4(p,1.0);}",
+    "#version 300 es\nprecision highp float;in float vt;uniform vec3 c;uniform float g;out vec4 o;\
+void main(){float a=pow(1.0-vt,1.35)*0.85*g;o=vec4(c,a);}");
+
   var rodP = prog(
     "#version 300 es\nin vec3 p;in vec3 n;uniform mat4 mvp;uniform mat4 mv;out vec3 vn;out vec3 ve;\
 void main(){vec4 e=mv*vec4(p,1.0);ve=e.xyz;vn=mat3(mv)*n;gl_Position=mvp*vec4(p,1.0);}",
     "#version 300 es\nprecision highp float;in vec3 vn;in vec3 ve;uniform vec3 c;uniform float hl;out vec4 o;\
 void main(){vec3 N=normalize(vn);float lam=0.45+0.55*max(dot(N,normalize(vec3(0.4,0.7,0.8))),0.0);\
-o=vec4(c*lam+hl*0.35,1.0);}");
+o=vec4(c*lam+hl*0.55,1.0);}");
 
   /* ---------- geometry ---------- */
-  var shell = null, rods = [], CENTER = [0, 0, 0], RADIUS = 8;
+  var shell = null, rods = [], cones = [], CENTER = [0, 0, 0], RADIUS = 8;
 
   function buildShell(buf) {
     var m = META, n = m.verts;
@@ -926,6 +933,34 @@ o=vec4(c*lam+hl*0.35,1.0);}");
     return { vao: vao, count: I.length };
   }
 
+  // NA 0.37 in tissue (n = 1.36) gives a 15.8 deg half-angle at the tip.
+  function buildCone(apex, L, segs) {
+    var R = L * Math.tan(15.8 * Math.PI / 180);
+    var P = [apex[0], apex[1], apex[2]], T = [0], I = [];
+    for (var s2 = 0; s2 <= segs; s2++) {
+      var a = s2 / segs * Math.PI * 2;
+      P.push(apex[0] + Math.cos(a) * R, apex[1] + Math.sin(a) * R, apex[2] - L);
+      T.push(1);
+    }
+    for (var s3 = 0; s3 < segs; s3++) I.push(0, 1 + s3, 2 + s3);
+    var vao = gl.createVertexArray(); gl.bindVertexArray(vao);
+    var bp = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bp);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(P), gl.STATIC_DRAW);
+    var lp = gl.getAttribLocation(coneP, "p");
+    gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp, 3, gl.FLOAT, false, 0, 0);
+    var bt = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bt);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(T), gl.STATIC_DRAW);
+    var lt = gl.getAttribLocation(coneP, "t");
+    gl.enableVertexAttribArray(lt); gl.vertexAttribPointer(lt, 1, gl.FLOAT, false, 0, 0);
+    var ib = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(I), gl.STATIC_DRAW);
+    gl.bindVertexArray(null);
+    return { vao: vao, count: I.length };
+  }
+
+  // the three interleaved excitation wavelengths, as rendered colours
+  var LEDS = [[0.16, 0.48, 1.0], [0.62, 0.95, 0.15], [0.60, 0.22, 0.98]];  // 470, 560, 415 nm
+
   /* ---------- camera ---------- */
   var az = 0.62, el = 0.22, dist = 2.3, target = null, autoT = 0, idle = 0;
   var VIEWS = { lat: [0.0, 0.05], top: [0.0, 1.42], front: [Math.PI / 2, 0.08] };
@@ -952,9 +987,11 @@ o=vec4(c*lam+hl*0.35,1.0);}");
     return [(x / wv * 0.5 + 0.5) * w, (1 - (y / wv * 0.5 + 0.5)) * h];
   }
 
-  var lastMVP = null, hover = -1, selected = -1;
+  var lastMVP = null, hover = -1, selected = -1, frameN = 0;
+  var calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function draw() {
+    frameN++;
     var r = resize();
     gl.viewport(0, 0, cv.width, cv.height);
     gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -969,12 +1006,24 @@ o=vec4(c*lam+hl*0.35,1.0);}");
     gl.uniformMatrix4fv(gl.getUniformLocation(rodP, "mvp"), false, mvp);
     gl.uniformMatrix4fv(gl.getUniformLocation(rodP, "mv"), false, cam.view);
     for (var i = 0; i < rods.length; i++) {
-      var on = (i === hover || i === selected);
+      var on = (i === hover || i === selected) ? (i === selected ? 1.0 : 0.45) : 0.0;
       var c = col("--" + groupOf(FIB[i].abbr));
       gl.uniform3f(gl.getUniformLocation(rodP, "c"), c[0], c[1], c[2]);
-      gl.uniform1f(gl.getUniformLocation(rodP, "hl"), on ? 1 : 0);
+      gl.uniform1f(gl.getUniformLocation(rodP, "hl"), on);
       gl.bindVertexArray(rods[i].vao);
       gl.drawElements(gl.TRIANGLES, rods[i].count, gl.UNSIGNED_SHORT, 0);
+    }
+
+    if (selected >= 0 && cones[selected]) {
+      gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
+      gl.useProgram(coneP);
+      gl.uniformMatrix4fv(gl.getUniformLocation(coneP, "mvp"), false, mvp);
+      var led = calm ? [0.42, 0.52, 0.72] : LEDS[Math.floor(frameN / 2) % 3];
+      gl.uniform3f(gl.getUniformLocation(coneP, "c"), led[0], led[1], led[2]);
+      gl.uniform1f(gl.getUniformLocation(coneP, "g"), calm ? 0.8 : 1.0);
+      gl.bindVertexArray(cones[selected].vao);
+      gl.drawElements(gl.TRIANGLES, cones[selected].count, gl.UNSIGNED_SHORT, 0);
+      gl.bindVertexArray(null);
     }
 
     gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
@@ -1091,7 +1140,6 @@ o=vec4(c*lam+hl*0.35,1.0);}");
     list.appendChild(b);
   });
 
-  var calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function loop() {
     requestAnimationFrame(loop);
     if (target) {
@@ -1110,6 +1158,7 @@ o=vec4(c*lam+hl*0.35,1.0);}");
     buildShell(buf);
     FIB.forEach(function (f) {
       rods.push(buildRod([f.ml, f.ap, f.entry], [f.ml, f.ap, f.tip], 0.055));
+      cones.push(buildCone([f.ml, f.ap, f.tip - 0.02], 1.4, 24));
     });
     document.getElementById("hud").textContent = "drag to rotate · scroll to zoom";
     describe(-1);
